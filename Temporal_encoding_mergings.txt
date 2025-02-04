@@ -1,0 +1,139 @@
+#temporal_prediction_of_frequency
+from keras.models import Sequential
+from keras.layers import LSTM, Dense
+
+data = freq_attention
+n = 639
+d = 9
+
+# Prepare input data for LSTM
+X = data[:-1].reshape(d-1, -1, n*n)
+Y = data[1:].reshape(d-1, -1, n*n)
+
+# Define the LSTM model
+model = Sequential()
+model.add(LSTM(64, input_shape=(None, n*n)))
+model.add(Dense(n*n, activation='linear'))
+model.compile(loss='mean_squared_error', optimizer='adam')
+
+# Train the model
+model.fit(X, Y, epochs=100, batch_size=100, verbose=0)
+
+# Predict the next matrix
+X_new = np.expand_dims(data[-1].reshape(1, -1), axis=0)
+Y_pred = model.predict(X_new).reshape(n, n)
+Y_pred.shape
+Y_pred_freq = Y_pred
+Y_pred_freq
+#merge_with_ordered_users
+users = user_order_df['User']
+#users =sorted(users)
+users
+first_wt
+
+
+
+
+# Create a new 2-dimensional array with header values
+new_freq_pred = np.empty((640, 6), dtype='object')
+
+# Assign user indexes to the new array
+new_freq_pred[1:, 1:] = first_wt
+
+# Assign user indexes to the row and column headers
+#new_freq_pred[0, 1:] = users
+new_freq_pred[1:, 0] = users
+
+# Print the original array with headers
+print(new_freq_pred)
+
+new_freq_pred = pd.DataFrame(new_freq_pred)
+new_freq_pred
+new_freq_pred.to_csv("new_freq.csv")
+#temporal_prediction_of_amount
+from keras.models import Sequential
+from keras.layers import LSTM, Dense
+
+data = freq_attention
+n = 639
+d = 9
+
+# Prepare input data for LSTM
+X = data[:-1].reshape(d-1, -1, n*n)
+Y = data[1:].reshape(d-1, -1, n*n)
+
+# Define the LSTM model
+model = Sequential()
+model.add(LSTM(64, input_shape=(None, n*n)))
+model.add(Dense(n*n, activation='linear'))
+model.compile(loss='mean_squared_error', optimizer='adam')
+
+# Train the model
+model.fit(X, Y, epochs=100, batch_size=10, verbose=0)
+
+# Predict the next matrix
+X_new = np.expand_dims(data[-1].reshape(1, -1), axis=0)
+Y_pred = model.predict(X_new).reshape(n, n)
+Y_pred_amt = Y_pred
+Y_pred_amt
+#merge_with_ordered_users
+df_AMT = pd.DataFrame(di.items(), columns=['key', 'value'])
+print(df_AMT)
+# Define the user indexes
+users = df_AMT['key']
+
+
+
+
+# Create a new 2-dimensional array with header values
+new_amt_pred = np.empty((640, 6), dtype='object')
+
+# Assign user indexes to the new array
+new_amt_pred[1:, 1:] = first_wt
+
+# Assign user indexes to the row and column headers
+#new_amt_pred[0, 1:] = users
+new_amt_pred[1:, 0] = users
+
+# Print the original array with headers
+print(new_amt_pred)
+
+new_amt_pred = pd.DataFrame(new_amt_pred)
+new_amt_pred
+new_amt_pred.to_csv('new_amt.csv')
+#Merging of Attentions
+y_pred_amt = pd.read_csv("/content/new_amt (3).csv", header = None)
+y_pred_freq = pd.read_csv("/content/new_freq (2).csv", header = None)
+y_pred_amt = pd.DataFrame(y_pred_amt)
+y_pred_freq = pd.DataFrame(y_pred_freq)
+
+matrix_a = Y_pred_amt
+matrix_b = Y_pred_freq
+#final Merge
+merged_matrix = np.zeros((n, n))
+for i in range(n):
+for j in range(n):
+merged_matrix[i][j] = matrix_a[i][j] * matrix_b[i][j]
+
+# Print the merged matrix
+print("Merged Matrix:")
+print(merged_matrix)
+merged_matrix.shape
+users = sorted(users)
+users
+
+
+# Create a new 2-dimensional array with header values
+merged_mat = np.empty((640, 640), dtype='object')
+
+# Assign user indexes to the new array
+merged_mat[1:, 1:] = merged_matrix
+
+# Assign user indexes to the row and column headers
+merged_mat[0, 1:] = users
+merged_mat[1:, 0] = users
+
+# Print the original array with headers
+print(merged_mat)
+
+merged_matrix.to_csv("attention_Merged.csv")

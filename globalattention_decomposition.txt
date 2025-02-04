@@ -1,0 +1,92 @@
+matrix_transposed = np.transpose(freq_matrix, (2, 1, 0))
+X = matrix_transposed.reshape(9, 639, 639)
+print("Transformed 3D matrix:\n", X)
+selected_columns1 = df[["from","fromIsPhi"]]
+new_df1 = selected_columns1.copy()
+selected_columns2 = df[["to","toIsPhi"]]
+new_df2 = selected_columns2.copy()
+
+new_df1.rename(columns = {'from':'ID', 'fromIsPhi':'IsPhi'}, inplace = True)
+new_df2.rename(columns = {'to':'ID', 'toIsPhi':'IsPhi'}, inplace = True)
+
+dataframe = [new_df1, new_df2]
+allids = pd.concat(dataframe)
+
+uniqueids=allids.drop_duplicates()
+
+import numpy as np
+from scipy.special import softmax
+
+# Create a 3D array for query, key, and value with shape (2, 3, 4)
+qkv = Y
+
+# Calculate dot product of query and key and divide by square root of the last dimension
+scores = np.matmul(qkv, qkv.transpose((0, 2, 1))) / np.sqrt(qkv.shape[-1])
+
+# Apply softmax activation function along the last axis to get attention probabilities
+amt_attention = softmax(scores, axis=-1)
+
+# Print attention probabilities
+print(amt_attention)
+
+
+#attention_on_amount_tensor
+import numpy as np
+from scipy.special import softmax
+
+# Create a 3D array for query, key, and value with shape (2, 3, 4)
+qkv = Y
+
+# Calculate dot product of query and key and divide by square root of the last dimension
+scores = np.matmul(qkv, qkv.transpose((0, 2, 1))) / np.sqrt(qkv.shape[-1])
+
+# Apply softmax activation function along the last axis to get attention probabilities
+amt_attention = softmax(scores, axis=-1)
+
+# Print attention probabilities
+print(amt_attention)
+#decomposition_module
+!pip install tensorly
+
+import numpy as np
+import tensorly as tl
+from tensorly.decomposition import parafac
+np.random.seed(1234)
+np.set_printoptions(precision=2, suppress=True)
+W = tl.tensor(amt_attention)# wt is the weight array shown earlier
+weights, factors = parafac(W, rank=5)
+[f.shape for f in factors]
+
+first_wt =factors[1]
+vert_wt =factors[2]
+#horz_wt = factors[3]
+last = factors[0]
+#frequencyAttention
+import numpy as np
+from scipy.special import softmax
+
+# Create a 3D array for query, key, and value with shape (2, 3, 4)
+qkv = X
+
+# Calculate dot product of query and key and divide by square root of the last dimension
+scores = np.matmul(qkv, qkv.transpose((0, 2, 1))) / np.sqrt(qkv.shape[-1])
+
+# Apply softmax activation function along the last axis to get attention probabilities
+freq_attention = softmax(scores, axis=-1)
+
+# Print attention probabilities
+print(freq_attention)
+#decomposition_module
+import numpy as np
+import tensorly as tl
+from tensorly.decomposition import parafac
+np.random.seed(1234)
+np.set_printoptions(precision=2, suppress=True)
+W = tl.tensor(freq_attention)# wt is the weight array shown earlier
+weights, factors = parafac(W, rank=5)
+[f.shape for f in factors]
+
+first_wt =factors[1]
+vert_wt =factors[2]
+#horz_wt = factors[3]
+last = factors[0]
