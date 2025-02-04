@@ -1,0 +1,331 @@
+#final Classification
+import tensorflow
+from tensorflow.keras import Sequential
+from tensorflow.keras.layers import Conv1D, MaxPool1D,Flatten,Dense,Dropout,BatchNormalization
+from tensorflow.keras.optimizers import Adam
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+from collections import Counter
+from imblearn.over_sampling import SMOTE
+from sklearn import datasets,metrics
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import StandardScaler
+from sklearn.preprocessing import MinMaxScaler
+from numpy import mean
+from numpy import std
+from sklearn.datasets import make_classification
+from sklearn.model_selection import KFold
+from sklearn.model_selection import RepeatedKFold
+from sklearn.model_selection import cross_val_score
+from sklearn.model_selection import GridSearchCV
+from sklearn.metrics import accuracy_score
+from sklearn.metrics import confusion_matrix
+from sklearn.metrics import classification_report
+from xgboost import XGBClassifier
+from sklearn.ensemble import AdaBoostClassifier
+from sklearn.ensemble import GradientBoostingClassifier
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.neighbors import KNeighborsClassifier
+from lightgbm import LGBMClassifier
+from sklearn.svm import SVC, LinearSVC
+import scipy.stats as stats
+from sklearn.feature_selection import mutual_info_classif
+
+from sklearn.linear_model import LogisticRegression
+from sklearn.neural_network import MLPClassifier
+from imblearn.under_sampling import RandomUnderSampler
+from sklearn.model_selection import train_test_split
+from sklearn.model_selection import GridSearchCV
+from sklearn.metrics import classification_report
+from sklearn.svm import SVC
+import matplotlib.pyplot as plt
+from sklearn.metrics import (confusion_matrix, precision_recall_curve, auc,
+roc_curve, recall_score, classification_report, f1_score,
+precision_recall_fscore_support)
+
+
+import pandas as pd
+import numpy as np
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
+%matplotlib inline
+from sklearn.preprocessing import LabelEncoder
+
+data = df_new
+data.IsPhi.value_counts()
+X = data.drop(['IsPhi'], axis=1)
+X = X.drop(['ID'], axis=1)
+y = data['IsPhi']
+X = np.asarray(X).astype(np.float32)
+y = np.asarray(y).astype(np.float32)
+
+X_train,X_test,y_train,y_test= train_test_split(X,y,test_size=0.2,stratify=y)
+
+scaler = StandardScaler()
+X_train = scaler.fit_transform(X_train)
+X_test = scaler.transform(X_test)
+
+X_train.shape
+X_test.shape
+
+RFC = RandomForestClassifier()
+model = RFC.fit(X_train, y_train)
+y_pred = model.predict(X_test)
+print("Random Forest Classifier Model Accuracy:", accuracy_score(y_test, y_pred))
+print(confusion_matrix(y_test, y_pred))
+print()
+print("Classification Report")
+print(classification_report(y_test, y_pred))
+fpr, tpr, thresholds = roc_curve(y_test, y_pred)
+roc_auc = auc(fpr, tpr)
+plt.title('Receiver Operating Characteristic')
+plt.plot(fpr, tpr, label='AUC = %0.4f'% roc_auc)
+plt.legend(loc='lower right')
+plt.plot([0,1],[0,1],'r--')
+plt.xlim([-0.001, 1])
+plt.ylim([0, 1.001])
+plt.ylabel('True Positive Rate')
+plt.xlabel('False Positive Rate')
+plt.show();
+
+
+SVM = SVC()
+model = SVM.fit(X_train, y_train)
+y_pred = model.predict(X_test)
+print("SVM Classifier Model Accuracy:", accuracy_score(y_test, y_pred))
+print(confusion_matrix(y_test, y_pred))
+print()
+print("Classification Report")
+print(classification_report(y_test, y_pred))
+fpr, tpr, thresholds = roc_curve(y_test, y_pred)
+roc_auc = auc(fpr, tpr)
+plt.title('Receiver Operating Characteristic')
+plt.plot(fpr, tpr, label='AUC = %0.4f'% roc_auc)
+plt.legend(loc='lower right')
+plt.plot([0,1],[0,1],'r--')
+plt.xlim([-0.001, 1])
+plt.ylim([0, 1.001])
+plt.ylabel('True Positive Rate')
+plt.xlabel('False Positive Rate')
+plt.show();
+
+LR=LogisticRegression()
+model = LR.fit(X_train, y_train)
+y_pred = model.predict(X_test)
+print("Logistic Regression Classifier Model Accuracy:", accuracy_score(y_test, y_pred))
+print(confusion_matrix(y_test, y_pred))
+print()
+print("Classification Report")
+print(classification_report(y_test, y_pred))
+fpr, tpr, thresholds = roc_curve(y_test, y_pred)
+roc_auc = auc(fpr, tpr)
+plt.title('Receiver Operating Characteristic')
+plt.plot(fpr, tpr, label='AUC = %0.4f'% roc_auc)
+plt.legend(loc='lower right')
+plt.plot([0,1],[0,1],'r--')
+plt.xlim([-0.001, 1])
+plt.ylim([0, 1.001])
+plt.ylabel('True Positive Rate')
+plt.xlabel('False Positive Rate')
+plt.show();
+
+MLP=MLPClassifier()
+model = MLP.fit(X_train, y_train)
+y_pred = model.predict(X_test)
+print("MLP Classifier Model Accuracy:", accuracy_score(y_test, y_pred))
+print(confusion_matrix(y_test, y_pred))
+print()
+print("Classification Report")
+print(classification_report(y_test, y_pred))
+fpr, tpr, thresholds = roc_curve(y_test, y_pred)
+roc_auc = auc(fpr, tpr)
+plt.title('Receiver Operating Characteristic')
+plt.plot(fpr, tpr, label='AUC = %0.4f'% roc_auc)
+plt.legend(loc='lower right')
+plt.plot([0,1],[0,1],'r--')
+plt.xlim([-0.001, 1])
+plt.ylim([0, 1.001])
+plt.ylabel('True Positive Rate')
+plt.xlabel('False Positive Rate')
+plt.show();
+
+
+
+XGB=XGBClassifier()
+model = XGB.fit(X_train, y_train)
+y_pred = model.predict(X_test)
+print("XGB Classifier Model Accuracy:", accuracy_score(y_test, y_pred))
+print(confusion_matrix(y_test, y_pred))
+print()
+print("Classification Report")
+print(classification_report(y_test, y_pred))
+fpr, tpr, thresholds = roc_curve(y_test, y_pred)
+roc_auc = auc(fpr, tpr)
+plt.title('Receiver Operating Characteristic')
+plt.plot(fpr, tpr, label='AUC = %0.4f'% roc_auc)
+plt.legend(loc='lower right')
+plt.plot([0,1],[0,1],'r--')
+plt.xlim([-0.001, 1])
+plt.ylim([0, 1.001])
+plt.ylabel('True Positive Rate')
+plt.xlabel('False Positive Rate')
+plt.show();
+
+X = data.drop(['IsPhi'], axis=1)
+X = X.drop(['ID'], axis=1)
+y = data['IsPhi']
+from imblearn.under_sampling import RandomUnderSampler
+counter = Counter(y)
+print(counter)
+rus = RandomUnderSampler(random_state=0)
+rus.fit(X, y)
+X, y = rus.fit_resample(X, y)
+counter = Counter(y)
+print(counter)
+X = pd.DataFrame(X)
+y = pd.DataFrame(y)
+
+
+
+XGB=XGBClassifier()
+model = XGB.fit(X_train, y_train)
+y_pred = model.predict(X_test)
+print("XGB Classifier Model Accuracy:", accuracy_score(y_test, y_pred))
+print(confusion_matrix(y_test, y_pred))
+print()
+print("Classification Report")
+print(classification_report(y_test, y_pred))
+fpr, tpr, thresholds = roc_curve(y_test, y_pred)
+roc_auc = auc(fpr, tpr)
+plt.title('Receiver Operating Characteristic')
+plt.plot(fpr, tpr, label='AUC = %0.4f'% roc_auc)
+plt.legend(loc='lower right')
+plt.plot([0,1],[0,1],'r--')
+plt.xlim([-0.001, 1])
+plt.ylim([0, 1.001])
+plt.ylabel('True Positive Rate')
+plt.xlabel('False Positive Rate')
+plt.show();
+
+X = data.drop(['IsPhi'], axis=1)
+X = X.drop(['ID'], axis=1)
+y = data['IsPhi']
+
+from collections import Counter
+from imblearn.over_sampling import SMOTE
+oversample = SMOTE(k_neighbors=3)
+counter = Counter(y)
+print(counter)
+X, y = oversample.fit_resample(X, y)
+counter = Counter(y)
+print(counter)
+X = pd.DataFrame(X)
+y = pd.DataFrame(y)
+
+
+
+XGB=XGBClassifier()
+model = XGB.fit(X_train, y_train)
+y_pred = model.predict(X_test)
+print("XGB Classifier Model Accuracy:", accuracy_score(y_test, y_pred))
+print(confusion_matrix(y_test, y_pred))
+print()
+print("Classification Report")
+print(classification_report(y_test, y_pred))
+fpr, tpr, thresholds = roc_curve(y_test, y_pred)
+roc_auc = auc(fpr, tpr)
+plt.title('Receiver Operating Characteristic')
+plt.plot(fpr, tpr, label='AUC = %0.4f'% roc_auc)
+plt.legend(loc='lower right')
+plt.plot([0,1],[0,1],'r--')
+plt.xlim([-0.001, 1])
+plt.ylim([0, 1.001])
+plt.ylabel('True Positive Rate')
+plt.xlabel('False Positive Rate')
+plt.show();
+
+
+RFC = RandomForestClassifier()
+model = RFC.fit(X_train, y_train)
+y_pred = model.predict(X_test)
+print("Random Forest Classifier Model Accuracy:", accuracy_score(y_test, y_pred))
+print(confusion_matrix(y_test, y_pred))
+print()
+print("Classification Report")
+print(classification_report(y_test, y_pred))
+fpr, tpr, thresholds = roc_curve(y_test, y_pred)
+roc_auc = auc(fpr, tpr)
+plt.title('Receiver Operating Characteristic')
+plt.plot(fpr, tpr, label='AUC = %0.4f'% roc_auc)
+plt.legend(loc='lower right')
+plt.plot([0,1],[0,1],'r--')
+plt.xlim([-0.001, 1])
+plt.ylim([0, 1.001])
+plt.ylabel('True Positive Rate')
+plt.xlabel('False Positive Rate')
+plt.show();
+
+
+SVM = SVC()
+model = SVM.fit(X_train, y_train)
+y_pred = model.predict(X_test)
+print("SVM Classifier Model Accuracy:", accuracy_score(y_test, y_pred))
+print(confusion_matrix(y_test, y_pred))
+print()
+print("Classification Report")
+print(classification_report(y_test, y_pred))
+fpr, tpr, thresholds = roc_curve(y_test, y_pred)
+roc_auc = auc(fpr, tpr)
+plt.title('Receiver Operating Characteristic')
+plt.plot(fpr, tpr, label='AUC = %0.4f'% roc_auc)
+plt.legend(loc='lower right')
+plt.plot([0,1],[0,1],'r--')
+plt.xlim([-0.001, 1])
+plt.ylim([0, 1.001])
+plt.ylabel('True Positive Rate')
+plt.xlabel('False Positive Rate')
+plt.show();
+
+LR=LogisticRegression()
+model = LR.fit(X_train, y_train)
+y_pred = model.predict(X_test)
+print("Logistic Regression Classifier Model Accuracy:", accuracy_score(y_test, y_pred))
+print(confusion_matrix(y_test, y_pred))
+print()
+print("Classification Report")
+print(classification_report(y_test, y_pred))
+fpr, tpr, thresholds = roc_curve(y_test, y_pred)
+roc_auc = auc(fpr, tpr)
+plt.title('Receiver Operating Characteristic')
+plt.plot(fpr, tpr, label='AUC = %0.4f'% roc_auc)
+plt.legend(loc='lower right')
+plt.plot([0,1],[0,1],'r--')
+plt.xlim([-0.001, 1])
+plt.ylim([0, 1.001])
+plt.ylabel('True Positive Rate')
+plt.xlabel('False Positive Rate')
+plt.show();
+
+MLP=MLPClassifier()
+model = MLP.fit(X_train, y_train)
+y_pred = model.predict(X_test)
+print("MLP Classifier Model Accuracy:", accuracy_score(y_test, y_pred))
+print(confusion_matrix(y_test, y_pred))
+print()
+print("Classification Report")
+print(classification_report(y_test, y_pred))
+fpr, tpr, thresholds = roc_curve(y_test, y_pred)
+roc_auc = auc(fpr, tpr)
+plt.title('Receiver Operating Characteristic')
+plt.plot(fpr, tpr, label='AUC = %0.4f'% roc_auc)
+plt.legend(loc='lower right')
+plt.plot([0,1],[0,1],'r--')
+plt.xlim([-0.001, 1])
+plt.ylim([0, 1.001])
+plt.ylabel('True Positive Rate')
+plt.xlabel('False Positive Rate')
+plt.show();

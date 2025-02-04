@@ -1,0 +1,195 @@
+#Static_structural_enhancement
+merged_matrix = pd.read_csv("/content/attention_Merged (3).csv", header = None)
+import networkx as nx
+
+# Define the weight matrix
+weights = merged_matrix
+
+# Create a directed graph
+G = nx.DiGraph()
+
+# Add nodes to the graph
+for i in range(len(weights)):
+G.add_node(i)
+
+# Add edges to the graph with the corresponding weights
+for i in range(len(weights)):
+for j in range(len(weights[i])):
+if weights[i][j] != 0:
+G.add_edge(i, j, weight=weights[i][j])
+
+import matplotlib.pyplot as plt
+#AttentionbasedGCN
+import csv
+import numpy as np
+
+def calculate_attention_scores(weight_matrix):
+num_nodes = weight_matrix.shape[0]
+attention_scores = np.zeros((num_nodes, num_nodes))
+
+for i in range(num_nodes):
+# Calculate attention scores for neighbors (both input and output)
+neighbor_indices = np.where(weight_matrix[:, i] > 0)[0]
+total_weight = np.sum(weight_matrix[neighbor_indices, i])
+
+if total_weight > 0:
+attention_scores[neighbor_indices, i] = weight_matrix[neighbor_indices, i] / total_weight
+
+return attention_scores
+
+def save_attention_scores(attention_scores, output_file):
+num_nodes = attention_scores.shape[0]
+node_ids = np.arange(num_nodes)
+
+with open(output_file, 'w', newline='') as csvfile:
+writer = csv.writer(csvfile)
+writer.writerow(['Node ID'] + node_ids.tolist())
+
+for i in range(num_nodes):
+writer.writerow([node_ids[i]] + attention_scores[:, i].tolist())
+
+# Example usage
+weight_matrix = np.array(merged_matrix)
+
+attention_scores = calculate_attention_scores(weight_matrix)
+save_attention_scores(attention_scores, 'attention_scores.csv')
+
+
+
+# Create a new 2-dimensional array with header values
+atten_score = np.empty((640, 640), dtype='object')
+
+# Assign user indexes to the new array
+atten_score[1:, 1:] = attention_scores
+
+# Assign user indexes to the row and column headers
+atten_score[0, 1:] = users
+atten_score[1:, 0] = users
+
+# Print the original array with headers
+print(atten_score)
+
+atten_score.to_csv('atten_final.csv')
+#GNN_Module
+!pip install torch_geometric
+import numpy as np
+import pandas as pd
+import networkx as nx
+import torch
+import torch.nn as nn
+import torch.nn.functional as F
+import torch.optim as optim
+
+# Define the GCN model
+class GCN(nn.Module):
+def __init__(self, input_dim, hidden_dim, output_dim):
+super(GCN, self).__init__()
+self.gc1 = GraphConvolution(input_dim, hidden_dim)
+self.gc2 = GraphConvolution(hidden_dim, output_dim)
+
+def forward(self, adj, features):
+x = F.relu(self.gc1(adj, features))
+x = self.gc2(adj, x)
+return x
+
+class GraphConvolution(nn.Module):
+def __init__(self, input_dim, output_dim):
+super(GraphConvolution, self).__init__()
+self.linear = nn.Linear(input_dim, output_dim)
+
+def forward(self, adj, features):
+x = torch.matmul(adj, features)
+x = self.linear(x)
+return x
+
+# Load the weight matrix for graph construction
+weight_matrix = merged_matrix
+
+# Create a graph from the weight matrix
+import networkx as nx
+
+# Define the weight matrix
+weights = merged_matrix
+
+# Create a directed graph
+G = nx.DiGraph()
+
+# Add nodes to the graph
+for i in range(len(weights)):
+G.add_node(i)
+
+# Add edges to the graph with the corresponding weights
+for i in range(len(weights)):
+for j in range(len(weights[i])):
+if weights[i][j] != 0:
+G.add_edge(i, j, weight=weights[i][j])
+
+# Load node feature matrix from CSV
+#features_df = df_new.drop(['value', 'IsPhi'], axis=1).values
+node_ids = df_new['ID'].values
+features = df_new.drop(['ID', 'IsPhi'], axis=1).values
+labels = df_new['IsPhi'].values
+
+
+# Preprocess the adjacency matrix
+adj = nx.adjacency_matrix(G)
+adj = adj.tocoo()
+row = adj.row
+col = adj.col
+data = adj.data
+adj = torch.sparse_coo_tensor((row, col), data, adj.shape)
+
+# Set random seed for reproducibility
+torch.manual_seed(42)
+
+# Define hyperparameters
+input_dim = features.shape[1]
+hidden_dim = 16
+output_dim = 8
+num_classes = len(np.unique(labels))
+lr = 0.0001
+epochs = 1000
+
+# Convert features and labels to torch.float64
+features = torch.from_numpy(features).double()
+labels = torch.from_numpy(labels).long()
+
+# Create the GCN model
+model = GCN(input_dim, hidden_dim, output_dim)
+
+# Convert model parameters to torch.float64
+model.double()
+
+# Define the loss function and optimizer
+criterion = nn.CrossEntropyLoss()
+optimizer = optim.Adam(model.parameters(), lr=lr)
+
+# Training loop
+for epoch in range(epochs):
+optimizer.zero_grad()
+output = model(adj, features)
+loss = criterion(output, labels)
+loss.backward()
+optimizer.step()
+print(f'Epoch: {epoch+1}/{epochs}, Loss: {loss.item()}')
+
+# Get node embeddings
+embeddings = model(adj, features).detach().numpy()
+
+# Perform node classification
+predicted_labels = np.argmax(embeddings, axis=1)
+
+# Save embeddings, node IDs, and predicted labels to CSV
+# output_df = pd.DataFrame(embeddings, columns=[f'embedding_{i+1}' for i in range(output_dim)])
+# output_df['node_id'] = node_ids
+# output_df['label'] = labels.numpy()
+# output_df['predicted_label'] = predicted_labels
+# output_df.to_csv('node_embeddings_classification.csv', index=False)
+confusion_mat = confusion_matrix(labels, predicted_labels)
+output_df = pd.DataFrame(embeddings, columns=[f'embedding_{i+1}' for i in range(output_dim)])
+output_df['node_id'] = node_ids
+output_df['label'] = labels
+output_df.to_csv('node_embeddings_classification.csv', index=False)
+# Print the confusion matrix
+print("Confusion Matrix:")
+print(confusion_mat)
