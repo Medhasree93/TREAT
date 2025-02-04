@@ -1,0 +1,68 @@
+import math
+import pandas as pd
+
+def torts_sampling_from_csv(file_path, output_dir):
+"""
+Implements the TORTS sampling algorithm with input from a CSV file and stores sublists in separate CSV files.
+
+Parameters:
+file_path (str): Path to the CSV file containing transaction data.
+output_dir (str): Directory where the sublist CSV files will be stored.
+
+Returns:
+None
+"""
+# Read the dataset from the CSV file
+data = pd.read_csv(file_path)
+
+# Split the dataset into two lists based on phishing labels
+list_a = data[(data['fromIsPhi'] == 0) & (data['toIsPhi'] == 0)].to_dict('records')
+list_b = data[(data['fromIsPhi'] == 1) | (data['toIsPhi'] == 1)].to_dict('records')
+
+# Calculate the number of sublists to be created
+n_t = len(list_a) # Total number of normal transactions
+p_t = len(list_b) # Total number of phishing transactions
+num_sublists = math.ceil(n_t / p_t)
+
+# Print the statistics
+print(f"Total phishing transactions: {p_t}")
+print(f"Total non-phishing transactions: {n_t}")
+print(f"Number of sublists to be created: {num_sublists}")
+
+for i in range(num_sublists):
+# Initialize a new sublist
+sublist = list_b[:p_t] # Take all phishing transactions
+
+# Calculate the start and end index for normal transactions to be added
+start_idx = i * p_t
+end_idx = start_idx + p_t
+
+# Append a segment of normal transactions from list_a to the sublist
+if start_idx < n_t: # Ensure we do not go out of bounds
+sublist.extend(list_a[start_idx:end_idx])
+
+# Sort the sublist by the temporal order (assuming 'timestamp' field is present in the transaction data)
+sublist.sort(key=lambda x: x['timestamp'])
+
+# Convert sublist back to a DataFrame
+sublist_df = pd.DataFrame(sublist)
+
+# Save the sublist to a CSV file
+output_file = f"{output_dir}/sublist_{i + 1}.csv"
+sublist_df.to_csv(output_file, index=False)
+
+# Example usage:
+if __name__ == "__main__":
+import os
+
+# Path to the CSV file
+csv_file_path = "/content/my_final_data_int (1).csv"
+
+# Output directory for sublist CSV files
+output_directory = "output_sublists"
+os.makedirs(output_directory, exist_ok=True)
+
+# Call the TORTS sampling function
+torts_sampling_from_csv(csv_file_path, output_directory)
+
+print(f"Sublists have been stored in the directory: {output_directory}")
