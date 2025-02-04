@@ -1,0 +1,53 @@
+arr={}
+for index,item in df.iterrows():
+i=item['from']
+j=item['to']
+if arr.get((i,j,item['date'])) ==None:
+arr[(i,j,item['date'])]=1
+else:
+arr[(i,j,item['date'])]+=1
+
+
+freqorder = pd.DataFrame(arr.keys())
+freqorder = pd.concat([freqorder, freqorder2],join = 'outer', axis = 1)
+freqorder.to_csv("freqorder.csv")
+
+freq_matrix = np.zeros((len(users),len(users), len(dates)))
+for index,item in df.iterrows():
+i=users.index(item['from'])
+j=users.index(item['to'])
+k = dates.index(item['date'])
+if arr[(item['from'],item['to'],item['date'])]:
+freq_matrix[i][j][k] = arr[(item['from'],item['to'],item['date'])]
+import numpy as np
+import pandas as pd
+
+# Create a sample DataFrame
+data = {'from': df['from'],
+'to': df['to'],
+'date': df['date']}
+df_ = pd.DataFrame(data)
+
+# Extract unique users and dates
+users = sorted(list(set(df_['from'].unique()).union(set(df_['to'].unique()))))
+dates = sorted(df_['date'].unique())
+
+# Create a frequency matrix with user indexes
+freq_matrix_ = np.zeros((len(users), len(users), len(dates)))
+user_index = {user: index for index, user in enumerate(users)}
+
+# Populate the frequency matrix
+for index, item in df_.iterrows():
+i = user_index[item['from']]
+j = user_index[item['to']]
+k = dates.index(item['date'])
+freq_matrix_[i, j, k] += 1
+
+# Create a DataFrame for user order
+user_order_df = pd.DataFrame({'User': users})
+
+# Print the frequency matrix
+print(freq_matrix_)
+
+# Print the user order DataFrame
+print(user_order_df)

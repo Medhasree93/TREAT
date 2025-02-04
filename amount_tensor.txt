@@ -1,0 +1,16 @@
+import numpy as np
+dates = list(set(list(df["date"])))
+users = list(set(list(set(list(df["from"]))) + list(set(list(df["to"])))))
+#print("LEN OF USERS: ",users)
+amt_matrix = np.zeros((len(users),len(users), len(dates)))
+di = {}
+for i in range(len(users)):
+di[users[i]] = i
+print(di)
+for (i, date_) in enumerate(dates):
+df_temp = df[df["date"]== date_]
+for x,y,z in zip (df_temp["from"].tolist(),df_temp["to"].tolist(),df_temp["amount"].tolist()):
+#print(i)
+#print(x,"and",y)
+amt_matrix[di[x]][di[y]][i] += z
+print(amt_matrix)
